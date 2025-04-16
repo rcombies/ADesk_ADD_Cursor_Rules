@@ -1,0 +1,423 @@
+---
+description: Rules for pyRevit Development
+globs: 
+alwaysApply: false
+---
+---
+description: Rules for pyRevit Python Development
+globs: ["**/pyRevit/**/*.py", "*.extension/*.tab/*.panel/*.pushbutton/*.py", "*.extension/*.tab/*.panel/*.smartbutton/*.py", "*.extension/*.tab/*.panel/*.pulldown/*/*.py"]
+alwaysApply: false
+
+---
+
+```JSON
+{
+  "version": "2025-03-18_9:15 AM PT",
+  "cursor_ai_config": {
+    "language_features": {
+      "forbidden": ["f-strings"],
+      "required": ["error_handling", "docstrings", "standard_imports"],
+      "preferred": ["format()", "% formatting", "PEP8_compliance", "pyrevit_forms"]
+    },
+    "ironpython_limitations": {
+      "lambda_functions": {
+        "description": "Lambda functions have limitations in IronPython and can cause issues in certain contexts",
+        "recommended_approach": "Use named functions instead of lambda functions, especially in callbacks and event handlers",
+        "issues": [
+          "Lambda functions can cause memory leaks in long-running scripts",
+          "Lambdas in UI callbacks (like filterfunc) may cause unpredictable behavior",
+          "Scope and variable capture works differently than in CPython"
+        ],
+        "example": {
+          "problematic": "filterfunc=lambda x, term: term.lower() in x.lower()",
+          "preferred": [
+            "def filter_function(x, term):",
+            "    return term.lower() in x.lower()",
+            "",
+            "# Use the named function instead",
+            "filterfunc=filter_function"
+          ]
+        }
+      }
+    },
+    "agent_mode": {
+      "description": "Required structure when working on pyRevit scripts in Agent mode",
+      "folder_structure": {
+        "requirements": [
+          "Create a new folder with the name of the effort/task",
+          "Always name the main Python file 'script.py'",
+          "Include a bundle.yaml file with basic information",
+          "Ask the user where the folder structure should be created if a location wasn't specified"
+        ],
+        "example": {
+          "task_name/": [
+            "script.py",
+            "bundle.yaml"
+          ]
+        }
+      },
+      "bundle_yaml_template": [
+        "# title",
+        "# author",
+        "# highlight",
+        "# minimum supported Revit version",
+        "min_revit_version: 2020",
+        "# maximum supported Revit version",
+        "max_revit_version:2025",
+        "# context: zero-doc or active-doc",
+        "context: zero-doc",
+        "# Optional: tooltip for the button",
+        "tooltip: Brief description of what this script does",
+        "# Optional: button icon",
+        "# icon: icon.png"
+      ],
+      "script_py_template": [
+        "# Version: YYYY-MM-DD HH:MM PT",
+        "\"\"\"",
+        "Purpose: What the script does",
+        "Usage: How to use the script",
+        "Dependencies: Required libraries/references",
+        "\"\"\"",
+        "",
+        "import clr",
+        "clr.AddReference('RevitAPI')",
+        "clr.AddReference('RevitAPIUI')",
+        "from Autodesk.Revit.DB import *",
+        "from Autodesk.Revit.UI import *",
+        "",
+        "# Import pyRevit form modules",
+        "from pyrevit import forms",
+        "from pyrevit import script",
+        "",
+        "# Other necessary imports here",
+        "",
+        "# Main code within error handling",
+        "try:",
+        "    # Main code here",
+        "    pass",
+        "except Exception as e:",
+        "    forms.alert(str(e), title='Error')"
+      ]
+    },
+    "feature_templates": {
+      "base": {
+        "description": "Minimum required for any pyRevit script",
+        "imports": [
+          "import clr",
+          "clr.AddReference('RevitAPI')",
+          "clr.AddReference('RevitAPIUI')",
+          "from Autodesk.Revit.DB import *",
+          "from Autodesk.Revit.UI import *"
+        ]
+      },
+      "ui_interaction": {
+        "description": "For scripts needing forms and UI interaction",
+        "imports": [
+          "from pyrevit import forms",
+          "from pyrevit import script",
+          "output = script.get_output()"
+        ],
+        "preferred_approaches": [
+          "Start with built-in pyRevit forms when they meet requirements",
+          "Use forms.alert() instead of TaskDialog.Show()",
+          "Use forms.ask_for_string() for text input",
+          "Use forms.select_revit_elements() for element selection",
+          "Use forms.select_parameters() for parameter selection",
+          "Use forms.select_from_list() for simple list selection",
+          "Use forms.CommandSwitchWindow for command options"
+        ],
+        "custom_forms": {
+          "when_to_use": "When built-in pyRevit forms don't adequately meet the requirements",
+          "recommended_approach": "Use forms.WPF for custom WPF forms with XAML",
+          "benefits": [
+            "Greater control over UI layout and behavior",
+            "Complex data entry and visualization",
+            "Advanced user interactions",
+            "Specialized workflow requirements"
+          ]
+        }
+      },
+      "selection": {
+        "description": "For scripts working with element selection",
+        "imports": [
+          "from pyrevit.revit import doc, uidoc, selection"
+        ]
+      },
+      "forms": {
+        "description": "Common pyRevit form patterns",
+        "alert": [
+          "# Show simple alert",
+          "forms.alert('Message', title='Title')",
+          "",
+          "# Show alert with options",
+          "res = forms.alert('Message', options=['Option1', 'Option2'], title='Title')"
+        ],
+        "selection": [
+          "# Select elements from Revit document",
+          "elements = forms.select_revit_elements()",
+          "",
+          "# Select from list",
+          "selected = forms.select_from_list(['Item1', 'Item2', 'Item3'], multiselect=True)"
+        ],
+        "user_input": [
+          "# Get text input",
+          "value = forms.ask_for_string(default='Default value', prompt='Enter value:')",
+          "",
+          "# Get file path",
+          "filepath = forms.pick_file(file_ext='rvt')"
+        ],
+        "command_switch": [
+          "# Create a command switch window",
+          "selected_switch = forms.CommandSwitchWindow.show(['Option1', 'Option2', 'Option3'])"
+        ]
+      }
+    },
+    "templates": {
+      "error_handling": [
+        "try:",
+        "    # Code here",
+        "except Exception as e:",
+        "    forms.alert(str(e), title='Error')"
+      ],
+      "transaction": [
+        "with Transaction(doc, 'Transaction Name') as t:",
+        "    t.Start()",
+        "    # Code here",
+        "    t.Commit()"
+      ]
+    },
+    "documentation": {
+      "required": {
+        "timestamp": {
+          "description": "Every script must include a timestamp in Pacific Time",
+          "format": "YYYY-MM-DD HH:MM PT",
+          "example": "# Version: 2024-12-23 10:15 PT"
+        },
+        "preamble": {
+          "description": "Brief description of script purpose and functionality",
+          "sections": [
+            "Purpose: What the script does",
+            "Usage: How to use the script",
+            "Dependencies: Required libraries/references"
+          ],
+          "example": "\"\"\"\\nPurpose: Collects all walls on selected levels and reports their areas\\nUsage: Select levels in project, run script\\nDependencies: Revit API, pyRevit\\n\"\"\""
+        }
+      }
+    },
+    "optimization": {
+      "caching": {
+        "enabled": true,
+        "recommended_strategies": [
+          "dictionary_caching",
+          "parameter_caching"
+        ]
+      },
+      "api_patterns": {
+        "batch_collect": "Use FilteredElementCollector once",
+        "parameter_access": "Cache parameter values",
+        "transaction_grouping": "Group modifications in single transaction"
+      }
+    },
+    "ui_standards": {
+      "description": "Standards for user interface development in pyRevit scripts",
+      "ui_development_philosophy": "Start with pyRevit Forms when they meet requirements, but custom interfaces are acceptable and valuable for advanced functionality or specialized workflows",
+      "form_selection": {
+        "approach": "Consider simplest solution first, then progress to more custom solutions as needed",
+        "preference_order": [
+          "Built-in pyRevit forms (forms.alert, forms.select_from_list, etc.)",
+          "Custom pyRevit WPF forms (forms.WPF)",
+          "Custom Windows Forms or other UI frameworks"
+        ],
+        "decision_criteria": [
+          "Complexity of user interaction required",
+          "Need for real-time updates",
+          "Performance considerations",
+          "Consistency with pyRevit UI",
+          "Specialized workflow requirements",
+          "Development time constraints"
+        ]
+      },
+      "custom_interfaces": {
+        "appropriate_use_cases": [
+          "Complex data visualization",
+          "Interactive element selection and manipulation",
+          "Multi-step workflows",
+          "Specialized data entry forms",
+          "Advanced filtering and sorting interfaces"
+        ],
+        "implementation_guidance": [
+          "Follow platform UI guidelines and conventions",
+          "Maintain consistent styling with pyRevit when possible",
+          "Implement responsive UI for different screen sizes",
+          "Consider accessibility features",
+          "Provide clear user feedback and error handling"
+        ]
+      },
+      "modeless_forms": {
+        "description": "Non-blocking windows that allow users to interact with Revit while the form is open",
+        "when_to_use": "For operations that shouldn't block Revit's UI, especially for tools that:  1) Need to stay open during Revit operations  2) Monitor or visualize model data  3) Provide persistent UI controls",
+        "key_requirements": [
+          "Set __persistentengine__ = True at script level to keep IronPython engine alive",
+          "Use forms.WPFWindow (not ShowDialog) as base class with .Show() method",
+          "Implement proper event handling for Revit document changes",
+          "Use appropriate techniques for Revit API operations"
+        ],
+        "implementation_approaches": {
+          "event_handling": {
+            "description": "Two primary approaches for handling Revit events in modeless forms",
+            "pyrevit_events": {
+              "description": "Using pyRevit's event system with decorators",
+              "pros": ["Simpler implementation", "Automatic cleanup", "Built-in event types"],
+              "cons": ["Less direct control", "Limited to predefined event types"],
+              "example": [
+                "# Use pyRevit's event system with decorators",
+                "@revit.events.handle('doc-changed')",
+                "def on_doc_changed(sender, args):",
+                "    # Handle document changes",
+                "    pass",
+                "",
+                "# Clean up when form closes",
+                "def on_form_closed(self, sender, args):",
+                "    revit.events.stop_events()"
+              ]
+            },
+            "external_event_handler": {
+              "description": "Using IExternalEventHandler for Revit API operations",
+              "pros": ["More direct control", "Can handle any Revit API operation", "Better for complex operations"],
+              "cons": ["More complex implementation", "Requires more code", "Manual event registration/cleanup"],
+              "example": [
+                "# Create a handler class",
+                "class RevitOperationHandler(IExternalEventHandler):",
+                "    def __init__(self):",
+                "        self.operation = None",
+                "        self.operation_args = None",
+                "",
+                "    def set_operation(self, operation, *args):",
+                "        self.operation = operation",
+                "        self.operation_args = args",
+                "",
+                "    def Execute(self, uiapp):",
+                "        try:",
+                "            if self.operation:",
+                "                self.operation(*self.operation_args)",
+                "                self.operation = None",
+                "        except Exception as e:",
+                "            logger.error(str(e))",
+                "",
+                "    def GetName(self):",
+                "        return \"External Event Handler\"",
+                "",
+                "# In the form class:",
+                "self.handler = RevitOperationHandler()",
+                "self.ext_event = ExternalEvent.Create(self.handler)",
+                "",
+                "# To execute an operation:",
+                "self.handler.set_operation(self.select_element, element_id)",
+                "self.ext_event.Raise()"
+              ]
+            },
+            "direct_approach": {
+              "description": "Simpler approach for basic modeless forms",
+              "pros": ["Simpler code", "Fewer moving parts", "Easier to debug"],
+              "cons": ["Limited to simpler operations", "May cause stability issues with complex operations"],
+              "recommended_for": "Tools with limited Revit API interaction",
+              "example": [
+                "# Use read-only transactions for safe operations",
+                "with read_only_transaction(doc, \"Operation Name\"):",
+                "    # Perform read operations here",
+                "    pass"
+              ]
+            }
+          },
+          "ui_thread_handling": {
+            "description": "Best practices for updating UI from background threads",
+            "guidelines": [
+              "Use Dispatcher.Invoke for UI updates from background threads",
+              "Keep UI operations separate from Revit API operations",
+              "Handle exceptions in both UI and API contexts"
+            ],
+            "example": [
+              "# Update UI from background thread",
+              "self.Dispatcher.Invoke(",
+              "    System.Action(lambda: self.update_ui_with_data(data))",
+              ")"
+            ]
+          },
+          "error_handling": {
+            "description": "Enhanced error handling for modeless forms",
+            "best_practices": [
+              "Log errors to both console and UI",
+              "Catch InvalidOperationException explicitly",
+              "Provide user feedback for failures",
+              "Add debug logging for complex operations"
+            ],
+            "example": [
+              "try:",
+              "    # Operation code",
+              "except InvalidOperationException:",
+              "    # Prevent Revit crash",
+              "    logger.error(\"Invalid operation\")",
+              "except Exception as e:",
+              "    logger.error(\"Error: {}\".format(str(e)))",
+              "    self.Dispatcher.Invoke(",
+              "        System.Action(lambda: forms.alert(str(e), title=\"Error\"))",
+              "    )"
+            ]
+          }
+        },
+        "common_pitfalls": [
+          "Not using __persistentengine__ = True",
+          "Using ShowDialog instead of Show",
+          "Direct Revit API calls without proper context",
+          "Not handling UI thread properly",
+          "Missing event cleanup on form closing",
+          "Attempting transactions from background threads",
+          "Not using read-only transactions for data access"
+        ],
+        "read_only_transaction": {
+          "description": "Context manager for safe read operations",
+          "example": [
+            "@contextmanager",
+            "def read_only_transaction(doc, transaction_name=\"Read Only\"):",
+            "    \"\"\"Context manager for read-only transactions.\"\"\"",
+            "    t = Transaction(doc, transaction_name)",
+            "    t.Start()",
+            "    try:",
+            "        yield t",
+            "    finally:",
+            "        # Always roll back to prevent document modification",
+            "        t.RollBack()"
+          ]
+        },
+        "recommended_structure": {
+          "description": "Recommended structure for modeless form implementation",
+          "initialization": [
+            "1. Set __persistentengine__ = True at script level",
+            "2. Create a class inheriting from forms.WPFWindow",
+            "3. Initialize form with XAML file",
+            "4. Set up event handlers and data structures",
+            "5. Populate initial data",
+            "6. Call Show() (not ShowDialog)"
+          ],
+          "event_handling": [
+            "1. Register for Revit events using decorators or IExternalEventHandler",
+            "2. Create methods to handle UI events (button clicks, selection changes)",
+            "3. Implement proper cleanup when form closes"
+          ],
+          "revit_operations": [
+            "1. Use read-only transactions for data access",
+            "2. Use external events for document modifications",
+            "3. Update UI using Dispatcher.Invoke"
+          ]
+        }
+      },
+      "common_patterns": {
+        "element_selection": "Use forms.select_revit_elements() or selection.pick_element()",
+        "parameter_selection": "Use forms.select_parameters()",
+        "list_selection": "Use forms.select_from_list() or forms.SelectFromList",
+        "file_operations": "Use forms.pick_file() or forms.save_file()",
+        "alerts_notifications": "Use forms.alert() or output.print_md()"
+      }
+    }
+  }
+}

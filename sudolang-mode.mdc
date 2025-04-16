@@ -1,0 +1,884 @@
+---
+description: Activates SudoLang Mode
+globs: 
+alwaysApply: false
+---
+---
+description: SudoLang Mode for natural language coding, code understanding and investigation.
+globs: "*.sudo"
+alwaysApply: false
+
+---
+
+```JSON
+{
+  "version": "2024-12-23 10:15 PT",
+  "sudolang_workflow": {
+    "command_handling": {
+      "enabled": true,
+      "validation": {
+        "pre_execution": {
+          "checks": [
+            "command_syntax",
+            "current_mode_compatibility",
+            "file_state",
+            "unsaved_changes"
+          ],
+          "required": true
+        },
+        "post_execution": {
+          "verify_state_change": true,
+          "update_indicators": true,
+          "notify_completion": true
+        }
+      },
+      "execution_flow": {
+        "steps": [
+          "validate_command",
+          "backup_current_state",
+          "execute_actions",
+          "verify_execution",
+          "update_ui",
+          "notify_user"
+        ],
+        "error_handling": {
+          "rollback_on_failure": true,
+          "notify_user_on_error": true,
+          "logging": {
+            "enabled": true,
+            "level": "detailed"
+          }
+        }
+      },
+      "state_management": {
+        "track_mode_changes": true,
+        "persist_between_sessions": true,
+        "auto_restore": true,
+        "states": {
+          "sudo_mode": {
+            "indicators": ["SUDO MODE ACTIVE"],
+            "allowed_commands": ["all"]
+          },
+          "sudo_only": {
+            "indicators": ["SUDO ONLY MODE"],
+            "allowed_commands": ["sudo.only.end", "sudo.to"]
+          },
+          "bidirectional": {
+            "indicators": ["BIDIRECTIONAL MODE"],
+            "allowed_commands": ["all"]
+          },
+          "investigation": {
+            "indicators": ["INVESTIGATION MODE"],
+            "allowed_commands": ["all"]
+          },
+          "assist": {
+            "indicators": ["SUDO ASSIST MODE"],
+            "allowed_commands": ["all"]
+          }
+        },
+        "context_persistence": {
+          "enabled": true,
+          "storage_location": "local",
+          "persistence_items": [
+            "current_mode",
+            "active_files",
+            "development_history",
+            "constraint_definitions",
+            "function_definitions",
+            "code_analysis_results"
+          ],
+          "restoration_on_startup": true,
+          "context_continuity": {
+            "track_active_discussions": true,
+            "preserve_query_history": true,
+            "maintain_analysis_chain": true,
+            "save_incomplete_tasks": true
+          },
+          "versioning": {
+            "enabled": true,
+            "auto_checkpoint": true,
+            "restore_points": true,
+            "branching_support": true
+          }
+        }
+      },
+      "command_queue": {
+        "enabled": true,
+        "max_size": 100,
+        "processing": "sequential",
+        "priority_handling": true
+      },
+      "hooks": {
+        "pre_command": {
+          "save_state": true,
+          "validate_context": true
+        },
+        "post_command": {
+          "update_ui": true,
+          "sync_files": true,
+          "notify_completion": true
+        }
+      }
+    },
+    "description": "SudoLang-like workflow support for natural language programming",
+    "activation_state": {
+      "enabled": true,
+      "requires_command": true,
+      "activation_command": "/sudo"
+    },
+    "features": {
+      "natural_language_constraints": {
+        "enabled": true,
+        "activation_dependent": true,
+        "patterns": {
+          "constraint_definition": {
+            "format": "When {condition} then {action}",
+            "example": "When user requests new feature then generate both natural language and code implementations"
+          },
+          "state_tracking": {
+            "format": "State: {state_name} = {state_value}",
+            "example": "State: current_implementation_phase = 'natural_language_design'"
+          },
+          "function_definition": {
+            "format": "{function_name}()\n    {function_description}",
+            "example": "calculate_area()\n    this function calculates the area of a shape based on its dimensions",
+            "indentation": 4,
+            "parsing_rules": {
+              "name_validation": "^[a-zA-Z_][a-zA-Z0-9_]*$",
+              "parameters_support": true,
+              "parameter_format": "{name}: {type}",
+              "return_value_indication": "returns {value_description}",
+              "multi_line_descriptions": true
+            }
+          }
+        }
+      },
+      "natural_language_functions": {
+        "enabled": true,
+        "activation_dependent": true,
+        "syntax": {
+          "definition": "{function_name}({parameters})\n    {function_body}",
+          "parameters_optional": true,
+          "indentation": 4
+        },
+        "processing": {
+          "auto_convert_to_code": true,
+          "target_languages": ["python", "csharp", "typescript"],
+          "maintain_docstrings": true,
+          "include_type_hints": true
+        },
+        "editing_support": {
+          "syntax_highlighting": true,
+          "auto_completion": true,
+          "error_checking": true
+        }
+      },
+      "parallel_development": {
+        "enabled": true,
+        "activation_dependent": true,
+        "modes": {
+          "natural_language": {
+            "file_extension": ".sudo",
+            "template": {
+              "sections": [
+                "# Purpose",
+                "## Introduction",
+                "## State",
+                "## Constraints",
+                "## Interfaces",
+                "## Functions",
+                "## Commands"
+              ],
+              "default_content": {
+                "Purpose": "// Description of the program's purpose and functionality",
+                "Introduction": "// Brief introduction to what this program does",
+                "State": "// Define the program state variables\nState {\n  // Add state variables here\n}",
+                "Constraints": "// Define constraints that govern the program behavior\nConstraints {\n  // Add constraints here\n}",
+                "Interfaces": "// Define interfaces for the program\n// Example: UserInterface {\n//   name: String\n//   age: Number\n// }",
+                "Functions": "// Define functions or let the LLM infer them\n// Example: function calculateTotal(items)\n//    Returns the sum of all items",
+                "Commands": "// Define commands for user interaction\n// Example: /help - Display available commands"
+              }
+            },
+            "context_persistence": {
+              "enabled": true,
+              "features": {
+                "continuous_context": {
+                  "enabled": true,
+                  "session_tracking": true,
+                  "context_awareness": true,
+                  "progressive_development": true
+                },
+                "historical_preservation": {
+                  "track_iteration_history": true,
+                  "decision_tracking": true,
+                  "rationale_documentation": true,
+                  "change_justifications": true
+                },
+                "knowledge_accumulation": {
+                  "project_knowledge_base": true,
+                  "contextual_insights": true,
+                  "cross_reference_tracking": true,
+                  "related_concepts": true
+                },
+                "semantic_linking": {
+                  "link_related_components": true,
+                  "dependency_tracking": true,
+                  "impact_analysis": true,
+                  "concept_mapping": true
+                }
+              },
+              "storage_mechanisms": {
+                "inline_annotations": true,
+                "metadata_sections": true,
+                "external_context_store": false,
+                "version_control_integration": true
+              },
+              "restoration_behaviors": {
+                "auto_restore_on_open": true,
+                "context_breadcrumbs": true,
+                "session_continuity": true,
+                "progressive_disclosure": true
+              }
+            }
+          },
+          "implementation": {
+            "supported_languages": ["python", "csharp", "typescript"],
+            "synchronization": {
+              "enabled": true,
+              "strategy": "bidirectional"
+            }
+          }
+        },
+        "document_code_relationship": {
+          "enabled": true,
+          "sudolang_features": {
+            "pipe_operator": {
+              "enabled": true,
+              "description": "Enables function composition with the |> operator",
+              "transformation": "x |> f |> g → g(f(x))"
+            },
+            "constraints": {
+              "enabled": true,
+              "description": "Natural language constraints that guide program behavior",
+              "types": ["state_constraints", "behavior_constraints", "validation_constraints"]
+            },
+            "semantic_pattern_matching": {
+              "enabled": true,
+              "description": "Match patterns in natural language and trigger actions",
+              "format": "(condition) => action"
+            },
+            "referential_omnipotence": {
+              "enabled": true,
+              "description": "Automatically infer functions and behaviors from context"
+            },
+            "mermaid_diagrams": {
+              "enabled": true,
+              "description": "Support for Mermaid diagrams for visual representation"
+            },
+            "commands": {
+              "enabled": true,
+              "description": "Define /commands for user interaction",
+              "format": "/command [argument] - description"
+            }
+          },
+          "mapping_strategies": {
+            "section_to_code": {
+              "purpose_to_module_docstring": true,
+              "constraints_to_validation_code": true,
+              "functions_to_implementation": true,
+              "state_to_class_properties": true,
+              "interfaces_to_classes": true,
+              "commands_to_handlers": true
+            },
+            "inline_code_references": {
+              "enabled": true,
+              "format": "Implementation: {code_snippet}",
+              "automatically_update": true
+            },
+            "code_generation_markers": {
+              "enabled": true,
+              "format": "// Generated from: {sudo_section}",
+              "preserve_on_update": true
+            }
+          },
+          "transformation_rules": {
+            "natural_language_to_code": {
+              "function_definition": {
+                "template": "def {function_name}({parameters}):\n    \"{function_description}\"\n    {function_body}",
+                "parameter_mapping": "name: type → name: type",
+                "return_value_mapping": "returns value_description → return value"
+              },
+              "state_definition": {
+                "template": "self.{state_name} = {initial_value}",
+                "property_mapping": "State: name = value → self.name = value"
+              },
+              "constraint_definition": {
+                "template": "if not ({condition}):\n    raise ValueError(\"{error_message}\")",
+                "mapping": "When condition then action → if not (condition): raise ValueError(\"action\")"
+              },
+              "interface_definition": {
+                "template": "class {interface_name}:\n    \"{interface_description}\"\n    {properties}\n    {methods}",
+                "property_mapping": "property: type → self.property = None # type",
+                "method_mapping": "method_name() → def method_name(self):"
+              },
+              "command_definition": {
+                "template": "def handle_{command_name}({parameters}):\n    \"{command_description}\"\n    {command_body}",
+                "mapping": "/command [arg] - description → def handle_command(arg):"
+              },
+              "pipe_operator": {
+                "template": "{result} = {functions_chain}({input})",
+                "mapping": "input |> f |> g → result = g(f(input))"
+              }
+            },
+            "code_to_natural_language": {
+              "enabled": true,
+              "function_extraction": {
+                "template": "{function_name}({parameters})\n    {docstring}\n    returns {return_type}",
+                "extract_from_implementation": true
+              },
+              "class_extraction": {
+                "template": "Interface: {class_name}\n    {docstring}\n    Properties: {properties}\n    Methods: {methods}",
+                "extract_from_implementation": true
+              },
+              "constraint_extraction": {
+                "template": "Constraint: {constraint_name}\n    {constraint_description}",
+                "extract_from_implementation": true
+              },
+              "command_extraction": {
+                "template": "/{command_name} [{parameters}] - {description}",
+                "extract_from_implementation": true
+              }
+            }
+          },
+          "synchronization": {
+            "trigger_events": [
+              "sudo_file_save",
+              "implementation_file_save",
+              "explicit_sync_command"
+            ],
+            "conflict_resolution": {
+              "strategy": "prefer_sudo_on_conflict",
+              "notify_on_conflict": true,
+              "preserve_manual_changes": true,
+              "merge_algorithms": ["three_way_merge", "semantic_merge"]
+            },
+            "version_tracking": {
+              "track_sudo_to_code_versions": true,
+              "change_markers": "<!-- Changed from version: {version} -->",
+              "allow_rollback": true
+            },
+            "side_by_side_view": {
+              "enabled": true,
+              "sync_scrolling": true,
+              "highlight_related_sections": true,
+              "show_transformation_hints": true,
+              "layout_options": ["vertical_split", "horizontal_split", "tabbed"]
+            }
+          }
+        }
+      },
+      "learning_support": {
+        "enabled": true,
+        "features": {
+          "code_explanation": {
+            "detail_levels": ["beginner", "intermediate", "advanced"],
+            "formats": {
+              "inline_comments": true,
+              "natural_language_summary": true,
+              "step_by_step_breakdown": true
+            }
+          },
+          "pattern_recognition": {
+            "enabled": true,
+            "highlight_patterns": {
+              "algorithms": true,
+              "design_patterns": true,
+              "best_practices": true
+            }
+          }
+        }
+      },
+      "documentation_generation": {
+        "enabled": true,
+        "formats": {
+          "markdown": true,
+          "mermaid_diagrams": true
+        },
+        "content": {
+          "architecture_overview": true,
+          "flow_diagrams": true,
+          "sequence_diagrams": true,
+          "component_documentation": true
+        }
+      }
+    },
+    "workflow_triggers": {
+      "file_creation": {
+        "sudo_file": {
+          "create_parallel_implementation": true,
+          "template_selection": "based_on_context",
+          "location": "same_as_implementation",
+          "context_persistence": true
+        },
+        "implementation_file": {
+          "create_sudo_documentation": true,
+          "sync_with_existing_sudo": true,
+          "sudo_file_location": "same_directory",
+          "preserve_context": true
+        }
+      },
+      "file_modification": {
+        "sudo_file": {
+          "update_implementation": true,
+          "regenerate_documentation": true,
+          "preserve_location": true,
+          "maintain_context_history": true
+        },
+        "implementation_file": {
+          "update_sudo_documentation": true,
+          "validate_against_constraints": true,
+          "sudo_file_location": "same_directory",
+          "preserve_context_markers": true
+        }
+      },
+      "file_path_handling": {
+        "default_behavior": "same_directory",
+        "enforce_colocated_files": true,
+        "naming_convention": "${implementation_filename}.sudo",
+        "handle_existing_files": "update_in_place"
+      },
+      "context_management": {
+        "enabled": true,
+        "persistence_level": "high",
+        "context_markers": {
+          "enabled": true,
+          "format": "<!-- Context: {context_id} -->",
+          "automatic_insertion": true
+        },
+        "history_tracking": {
+          "enabled": true,
+          "track_changes": true,
+          "version_comments": true
+        },
+        "session_continuity": {
+          "restore_previous_context": true,
+          "context_indicators": true,
+          "auto_save_interval": "5min"
+        }
+      }
+    },
+    "integration": {
+      "version_control": {
+        "track_parallel_files": true,
+        "commit_messages": {
+          "include_natural_language": true,
+          "link_related_files": true
+        }
+      },
+      "ide_features": {
+        "split_view": {
+          "enabled": true,
+          "default_layout": "sudo_and_implementation"
+        },
+        "navigation": {
+          "sync_scrolling": true,
+          "cross_reference_links": true
+        },
+        "file_location": {
+          "enforce_same_directory": true,
+          "auto_relocate_existing_files": true,
+          "notify_on_relocation": true
+        }
+      }
+    },
+    "development_modes": {
+      "current_mode": "bidirectional",
+      "available_modes": {
+        "sudo_only": {
+          "description": "Development focused on SudoLang files only",
+          "trigger_command": "/sudo.only",
+          "settings": {
+            "implementation_sync": false,
+            "documentation_updates": true,
+            "constraint_validation": true,
+            "visual_indicator": "SUDO ONLY MODE"
+          }
+        },
+        "bidirectional": {
+          "description": "Full bidirectional development between sudo and implementation",
+          "trigger_command": "/sudo.only.end",
+          "settings": {
+            "implementation_sync": true,
+            "documentation_updates": true,
+            "constraint_validation": true,
+            "visual_indicator": "BIDIRECTIONAL MODE"
+          }
+        }
+      },
+      "mode_transitions": {
+        "validation": {
+          "required_before_switch": true,
+          "checks": [
+            "unsaved_changes",
+            "constraint_violations",
+            "syntax_errors"
+          ]
+        },
+        "notifications": {
+          "mode_change": true,
+          "validation_issues": true,
+          "sync_status": true
+        }
+      }
+    },
+    "commands": {
+      "development": {
+        "/sudo": {
+          "description": "Activate SudoLang workflow features and remind that we are in sudo mode",
+          "actions": [
+            "enable_sudolang_workflow",
+            "enable_parallel_development",
+            "enable_natural_language_constraints",
+            "enable_natural_language_functions",
+            "update_visual_indicator",
+            "notify_mode_activation"
+          ],
+          "validation_required": true,
+          "visual_indicator": "SUDO MODE ACTIVE",
+          "welcome_message": "🚀 SudoLang Mode Activated! 🚀\n\nYou are now in SudoLang mode, which enables natural language programming workflows.\n\nAvailable commands:\n- /sudo.only: Switch to SudoLang-only development\n- /sudo.only.end: Return to bidirectional development\n- /sudo.bi: Force bidirectional mode with immediate sync\n- /sudo.to: Push changes to implementation\n- /sudo.from: Update from implementation\n- /sudo.inv: Investigate code deeply using natural language\n- /sudo.assist: Get guided assistance through the development process\n- /sudo.end: Exit SudoLang mode\n\nCurrent mode: bidirectional (allows changes in both sudo and implementation files)\n\nSudoLang Features:\n- Define functions in natural language:\n  function_name(param1: type, param2: type)\n      This function does something with the parameters\n      It can have multiple lines of description\n      returns a specific value\n\nHow would you like to proceed?\nType /sudo.bi to enter forced bidirectional mode with immediate sync (changes synchronize automatically)\nType /sudo.only to focus on SudoLang-only development\nType /sudo.assist to get guided assistance for your development process"
+        },
+        "/sudo.end": {
+          "description": "Deactivate SudoLang workflow features",
+          "actions": [
+            "validate_pending_changes",
+            "save_final_state",
+            "disable_sudolang_workflow",
+            "disable_parallel_development",
+            "disable_natural_language_constraints",
+            "clear_visual_indicator",
+            "notify_mode_deactivation"
+          ],
+          "validation_required": true,
+          "pre_deactivation_checks": [
+            "unsaved_changes",
+            "pending_syncs",
+            "active_constraints"
+          ],
+          "cleanup_actions": [
+            "save_workspace_state",
+            "clear_command_queue",
+            "reset_indicators"
+          ],
+          "visual_indicator": "SUDO MODE INACTIVE",
+          "exit_message": "SudoLang Mode Deactivated. Returning to standard development environment."
+        },
+        "/sudo.only": {
+          "description": "Switch to SudoLang-only development mode",
+          "actions": [
+            "save_current_state",
+            "disable_implementation_sync",
+            "update_visual_indicator",
+            "notify_mode_change"
+          ],
+          "validation_required": true,
+          "visual_indicator": "SUDO ONLY MODE"
+        },
+        "/sudo.only.end": {
+          "description": "Return to bidirectional development mode",
+          "actions": [
+            "validate_sudo_changes",
+            "enable_implementation_sync",
+            "sync_implementation",
+            "update_visual_indicator",
+            "notify_mode_change"
+          ],
+          "validation_required": true
+        },
+        "/sudo.bi": {
+          "description": "Force bidirectional development mode with immediate sync",
+          "actions": [
+            "save_current_state",
+            "enable_implementation_sync",
+            "force_immediate_sync",
+            "update_visual_indicator",
+            "notify_mode_change"
+          ],
+          "validation_required": true,
+          "force_sync": true,
+          "visual_indicator": "BIDIRECTIONAL MODE"
+        },
+        "/sudo.to": {
+          "description": "Push changes from sudo file to implementation",
+          "actions": [
+            "validate_sudo_changes",
+            "generate_implementation_diff",
+            "apply_implementation_changes",
+            "update_documentation",
+            "notify_sync_complete"
+          ],
+          "validation_required": true,
+          "direction": "sudo_to_implementation"
+        },
+        "/sudo.from": {
+          "description": "Update sudo file from implementation code",
+          "actions": [
+            "analyze_implementation_changes",
+            "update_sudo_documentation",
+            "create sudo documentation if it doesn't exist",
+            "validate_constraints",
+            "update_visual_indicator",
+            "notify_sync_complete"
+          ],
+          "validation_required": true,
+          "direction": "implementation_to_sudo"
+        },
+        "/sudo.inv": {
+          "description": "Investigate code deeply using natural language",
+          "actions": [
+            "save_current_state",
+            "enable_investigation_mode",
+            "load_code_analysis_tools",
+            "update_visual_indicator",
+            "notify_mode_change"
+          ],
+          "validation_required": true,
+          "visual_indicator": "INVESTIGATION MODE",
+          "capabilities": [
+            "deep_code_analysis",
+            "natural_language_queries",
+            "pattern_detection",
+            "root_cause_analysis",
+            "dependency_mapping",
+            "code_flow_visualization"
+          ],
+          "welcome_message": "🔍 SudoLang Investigation Mode Activated! 🔍\n\nYou are now in Investigation Mode, which enables deep code analysis through natural language.\n\nCapabilities:\n- Ask questions about code in natural language\n- Analyze code structure and dependencies\n- Identify performance bottlenecks and anti-patterns\n- Trace execution flows and understand complex logic\n- Get multi-level explanations (high-level to line-by-line)\n- Troubleshoot issues with root cause analysis\n\nHow to use:\n1. Ask direct questions about the code (\"How does function X work?\")\n2. Request analysis (\"Explain the control flow of this module\")\n3. Seek troubleshooting help (\"Why might this code be causing memory leaks?\")\n4. Compare implementations (\"What's the difference between these approaches?\")\n\nTo exit investigation mode and return to standard SudoLang mode, type /sudo.only.end or /sudo.bi",
+          "explanation": "The idea behind /sudo.inv is that we investigate the associated code deeply via sudolang, allowing us to gain an understanding of the code or particular aspects of the code in natural language."
+        },
+        "/sudo.assist": {
+          "description": "Get guided assistance through the development process",
+          "actions": [
+            "save_current_state",
+            "enable_assist_mode",
+            "load_development_guidance",
+            "update_visual_indicator",
+            "notify_mode_change"
+          ],
+          "validation_required": true,
+          "visual_indicator": "SUDO ASSIST MODE",
+          "capabilities": [
+            "guided_development",
+            "phase_based_prompts",
+            "template_generation",
+            "progressive_refinement",
+            "constraint_validation",
+            "natural_language_to_code_conversion"
+          ],
+          "welcome_message": "🌟 SudoLang Assist Mode Activated! 🌟\n\nYou are now in Assist Mode, which provides guided development through natural language.\n\nDevelopment Phases:\n1. Concept - Define the core idea and problem statement\n2. Requirements - Specify requirements and constraints\n3. Components - Identify key components and relationships\n4. Functions - Define functions and behaviors\n5. State - Define state and transitions\n6. Implementation - Plan implementation details\n\nHow to use:\n- Follow the prompts to develop your idea step by step\n- Request to move to a specific phase (\"Let's work on the functions phase\")\n- Ask for examples or templates (\"Show me an example of state definition\")\n- Review progress (\"Summarize what we've defined so far\")\n\nTo begin, describe your project idea briefly and I'll guide you through the development process.",
+          "explanation": "The purpose of /sudo.assist is to provide structured guidance through the development process, helping users articulate their ideas in natural language before converting to code."
+        }
+      }
+    },
+    "mode_specific_behaviors": {
+      "sudo_only": {
+        "file_handling": {
+          "implementation_changes": "blocked",
+          "sudo_changes": "allowed",
+          "documentation_updates": "real_time"
+        },
+        "validation": {
+          "continuous": true,
+          "highlight_issues": true,
+          "suggest_fixes": true
+        },
+        "ui": {
+          "implementation_view": "read_only",
+          "sudo_view": "editable",
+          "mode_indicator": "visible"
+        }
+      },
+      "bidirectional": {
+        "file_handling": {
+          "implementation_changes": "allowed",
+          "sudo_changes": "allowed",
+          "documentation_updates": "real_time"
+        },
+        "validation": {
+          "continuous": true,
+          "highlight_issues": true,
+          "suggest_fixes": true
+        },
+        "ui": {
+          "implementation_view": "editable",
+          "sudo_view": "editable",
+          "mode_indicator": "visible"
+        }
+      },
+      "forced_bidirectional": {
+        "file_handling": {
+          "implementation_changes": "allowed",
+          "sudo_changes": "allowed",
+          "documentation_updates": "real_time",
+          "sync_behavior": "immediate"
+        },
+        "validation": {
+          "continuous": true,
+          "highlight_issues": true,
+          "suggest_fixes": true,
+          "force_resolution": true
+        },
+        "ui": {
+          "implementation_view": "editable",
+          "sudo_view": "editable",
+          "mode_indicator": "visible",
+          "sync_status": "always_visible"
+        }
+      },
+      "directional_sync": {
+        "file_handling": {
+          "implementation_changes": "controlled",
+          "sudo_changes": "controlled",
+          "documentation_updates": "on_demand",
+          "sync_behavior": "manual"
+        },
+        "validation": {
+          "pre_sync": true,
+          "highlight_conflicts": true,
+          "suggest_resolutions": true
+        },
+        "ui": {
+          "sync_direction_indicator": "visible",
+          "change_preview": true,
+          "conflict_resolution": "interactive"
+        }
+      },
+      "investigation": {
+        "file_handling": {
+          "implementation_changes": "read_only",
+          "sudo_changes": "allowed",
+          "documentation_updates": "real_time",
+          "analysis_annotations": "enabled"
+        },
+        "analysis_tools": {
+          "code_structure_analysis": true,
+          "control_flow_mapping": true,
+          "dependency_visualization": true,
+          "performance_hotspot_detection": true,
+          "anti_pattern_recognition": true,
+          "algorithm_identification": true
+        },
+        "natural_language_features": {
+          "code_explanation": {
+            "detail_levels": ["high_level", "function_level", "line_by_line"],
+            "audience_targets": ["beginner", "intermediate", "expert"]
+          },
+          "query_capabilities": {
+            "how_does_x_work": true,
+            "why_is_x_happening": true,
+            "what_affects_x": true,
+            "trace_execution_of_x": true,
+            "compare_x_and_y": true
+          },
+          "troubleshooting_assistance": {
+            "error_analysis": true,
+            "regression_detection": true,
+            "solution_suggestion": true,
+            "best_practice_guidance": true
+          }
+        },
+        "ui": {
+          "implementation_view": "annotated",
+          "investigation_panel": "visible",
+          "query_interface": "natural_language",
+          "visualization_tools": "interactive",
+          "mode_indicator": "INVESTIGATION MODE"
+        }
+      },
+      "assist": {
+        "file_handling": {
+          "implementation_changes": "read_only",
+          "sudo_changes": "allowed",
+          "documentation_updates": "real_time",
+          "template_generation": "enabled"
+        },
+        "development_guidance": {
+          "enabled": true,
+          "development_phases": [
+            {
+              "name": "concept",
+              "description": "Initial concept exploration",
+              "prompt": "Describe your idea in a few sentences. What problem are you trying to solve?",
+              "output_format": "Purpose: {purpose_statement}\nProblem: {problem_statement}"
+            },
+            {
+              "name": "requirements",
+              "description": "Gathering requirements and constraints",
+              "prompt": "What are the key requirements for your solution? What constraints must it satisfy?",
+              "output_format": "Requirements:\n- {requirement_1}\n- {requirement_2}\n\nConstraints:\n- {constraint_1}\n- {constraint_2}"
+            },
+            {
+              "name": "components",
+              "description": "Identifying key components and structures",
+              "prompt": "What are the main components or entities in your solution? How do they relate to each other?",
+              "output_format": "Components:\n- {component_1}: {description_1}\n- {component_2}: {description_2}\n\nRelationships:\n- {relationship_1}\n- {relationship_2}"
+            },
+            {
+              "name": "functions",
+              "description": "Defining functions and behaviors",
+              "prompt": "What are the key functions or behaviors your solution needs to implement?",
+              "output_format": "{function_name}({parameters})\n    {function_description}\n    returns {return_value}"
+            },
+            {
+              "name": "state",
+              "description": "Defining state and transitions",
+              "prompt": "What state does your solution need to maintain? How does that state change?",
+              "output_format": "State: {state_name} = {initial_value}\n\nTransitions:\nWhen {condition} then {state_change}"
+            },
+            {
+              "name": "implementation",
+              "description": "Planning implementation details",
+              "prompt": "How should this be implemented? Consider architecture, technologies, and patterns.",
+              "output_format": "Implementation Approach:\n{approach_description}\n\nTechnologies:\n- {technology_1}: {reason_1}\n- {technology_2}: {reason_2}"
+            }
+          ],
+          "lLM_behavior": {
+            "guide_through_phases": true,
+            "suggest_next_phase": true,
+            "provide_examples": true,
+            "ask_clarifying_questions": true,
+            "validate_against_constraints": true,
+            "progressive_refinement": true,
+            "detect_completeness": true
+          },
+          "templates": {
+            "project_structure": {
+              "sections": [
+                "# Purpose\n{purpose_statement}",
+                "# Requirements\n{requirements_list}",
+                "# Components\n{components_description}",
+                "# Functions\n{functions_list}",
+                "# State\n{state_definitions}",
+                "# Constraints\n{constraints_list}",
+                "# Implementation Notes\n{implementation_approach}"
+              ],
+              "automatic_generation": true
+            }
+          }
+        },
+        "validation": {
+          "continuous": true,
+          "highlight_issues": true,
+          "suggest_fixes": true,
+          "completeness_check": true
+        },
+        "ui": {
+          "implementation_view": "read_only",
+          "sudo_view": "editable",
+          "mode_indicator": "visible",
+          "phase_indicators": "visible",
+          "guidance_panel": "visible",
+          "template_panel": "available"
+        }
+      }
+    }
+  }
+} 

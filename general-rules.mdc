@@ -1,0 +1,196 @@
+---
+description: General Rules
+globs: 
+alwaysApply: false
+---
+---
+description: General development rules including literate programming standards
+globs: ["**/*.py", "**/*.cs", "**/*.js", "**/*.ts"]
+alwaysApply: true
+extends: [
+    "literate-programming-rules.mdc",
+    "pyrevit-rules.mdc",
+    "revitpythonshell-rules.mdc",
+    "dynamo-rules.mdc"
+]
+combinable: true
+priority: 1
+---
+
+# General Development Rules
+
+## Rule Combination Guidelines
+
+### 1. Base Rules
+These general rules serve as the foundation and can be combined with:
+- Literate Programming rules for documentation standards
+- PyRevit rules for pyRevit-specific development
+- RevitPythonShell rules for RPS development
+- Dynamo rules for Dynamo Python development
+
+### 2. Rule Application
+Rules are applied based on:
+- File type (determined by globs)
+- Development context (e.g., pyRevit vs RPS)
+- Specific user requirements
+- Tool-specific needs
+
+### 3. Rule Precedence
+1. General rules provide base standards
+2. Tool-specific rules (pyRevit, RPS, Dynamo) add context
+3. Documentation rules enhance code explanation
+4. Custom rules can override when needed
+
+## Documentation Standards
+
+### 1. Code Companion Documentation
+When developing new scripts or modifying existing ones:
+- Generate a CODE_COMPANION.md file in the same directory as the script
+- Follow literate programming principles from literate-programming-rules.mdc
+- Maintain documentation in sync with code changes
+
+The CODE_COMPANION.md should:
+- Follow the exact structure of the source code
+- Include line number references
+- Explain code in order of appearance
+- Use Mermaid diagrams for visualization
+- Reference only previously documented components
+
+Example request:
+```
+"Please create a code companion document for this script"
+"Please explain how this code works in a companion document"
+"Document this code following literate programming principles"
+```
+
+### 2. Documentation Structure
+CODE_COMPANION.md should follow this structure:
+```markdown
+# Code Companion: [Script Name]
+
+## Overview
+Brief description of the script's purpose and functionality
+
+## Code Structure
+Section by section explanation following the code's exact structure:
+
+### [Section Name] (lines X-Y)
+```python
+# Relevant code snippet
+```
+Explanation of this code section...
+
+[Continue with each section in order]
+```
+
+### 3. Progressive Documentation
+- Document each component when first encountered
+- Reference back to previous explanations when components are reused
+- No forward references to code not yet explained
+- Include examples using only previously documented components
+
+## Rule Implementation
+
+```json
+{
+  "version": "2024-03-19",
+  "cursor_rules": {
+    "rule_composition": {
+      "allow_extension": true,
+      "base_rules": ["general-rules"],
+      "extendable_rules": ["documentation", "optimization"],
+      "rule_priority": 1,
+      "compatible_rules": {
+        "documentation": ["literate-programming-rules"],
+        "revit_development": {
+          "pyrevit": ["pyrevit-rules"],
+          "revitpythonshell": ["revitpythonshell-rules"],
+          "dynamo": ["dynamo-rules"]
+        }
+      },
+      "context_detection": {
+        "pyrevit": {
+          "file_patterns": ["*.pushbutton/*", "*.pulldown/*"],
+          "apply_rules": ["pyrevit-rules"]
+        },
+        "revitpythonshell": {
+          "file_patterns": ["*.rps/*"],
+          "apply_rules": ["revitpythonshell-rules"]
+        },
+        "dynamo": {
+          "file_patterns": ["*.dyn/*"],
+          "apply_rules": ["dynamo-rules"]
+        }
+      }
+    },
+    "documentation": {
+      "code_companion": {
+        "enabled": true,
+        "use_literate_programming": true,
+        "triggers": [
+          "create a code companion",
+          "explain how this code works",
+          "document this code",
+          "create documentation"
+        ],
+        "file_pattern": "{source_file}_COMPANION.md",
+        "location": "same_directory",
+        "structure": {
+          "required_sections": [
+            "overview",
+            "code_structure"
+          ],
+          "code_following": {
+            "strict": true,
+            "line_numbers": true,
+            "progressive_disclosure": true
+          }
+        }
+      },
+      "documentation_standards": {
+        "format": "markdown",
+        "visual_aids": ["mermaid", "plantuml"],
+        "reference_style": "progressive",
+        "code_blocks": {
+          "syntax_highlighting": true,
+          "line_numbers": true
+        }
+      }
+    },
+    "optimization": {
+      "performance_rules": {
+        "caching": {
+          "strategies": {
+            "dictionary_caching": {
+              "description": "Key-value pairs for quick lookups",
+              "use_cases": ["element properties", "geometry"],
+              "example": "geometry_cache = {element.Id: element.Geometry}"
+            },
+            "set_caching": {
+              "description": "For unique values and quick lookups",
+              "use_cases": ["type IDs", "names"],
+              "example": "unique_types = {element.GetTypeId()}"
+            }
+          },
+          "enabled": true
+        },
+        "data_structures": {
+          "efficiency_rules": {
+            "sets": {
+              "use_cases": ["unique values", "quick lookups"],
+              "when_to_use": "When uniqueness is important"
+            },
+            "dictionaries": {
+              "use_cases": ["key-value pairs", "quick access"],
+              "when_to_use": "When lookup speed is critical"
+            },
+            "lists": {
+              "use_cases": ["ordered data", "sequential access"],
+              "when_to_use": "When order matters"
+            }
+          }
+        }
+      }
+    }
+  }
+}

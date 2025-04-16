@@ -1,0 +1,168 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# PyRevit UI Style Guide
+
+## Window Layout
+- Use a clean, modern layout with consistent spacing
+- Set reasonable minimum dimensions (e.g., MinWidth=400)
+- Enable window resizing with grip (ResizeMode.CanResizeWithGrip)
+- Use DockPanel as main container with LastChildFill=True
+- Place action buttons at bottom of window
+- Use ScrollViewer for main content area
+
+## Margins and Spacing
+- Window content: 10px margin all around
+- Between major sections: 10px margin
+- Between related controls: 5px margin
+- Button height: 30px standard
+- Input field width: 50px for numeric inputs
+
+## Typography
+- Use clear, descriptive headers for groups
+- Main instructions: Regular text, wrapped
+- Notes/descriptions: Italic, gray color (System.Windows.Media.Brushes.Gray)
+- Status text: Bold for emphasis
+- Error messages: Red color (System.Windows.Media.Brushes.Red)
+
+## GroupBox Usage
+- Group related controls with descriptive headers
+- Use for logical separation of functionality
+- Add 10px internal margin for content
+- Add 10px margin between groups
+
+## Input Controls
+- Label inputs clearly with units where applicable
+- Show current/default values in input fields
+- Add tooltips for additional context
+- Use appropriate input validation
+- Provide immediate feedback for invalid input
+- Place units label next to input fields with vertical center alignment
+
+## Button Standards
+- Primary action: Left-aligned or full width
+- Secondary actions: Right-aligned
+- Cancel/Close: Always bottom-right
+- Standard button height: 30px
+- Use descriptive button text
+- Add tooltips for additional context
+- When using button grid, add 5px margin between buttons
+
+## Status & Feedback
+- Show processing status in UI
+- Disable buttons during processing
+- Update button text to indicate action in progress
+- Use forms.alert() for important messages
+- Log detailed progress to output window
+
+## Visual Hierarchy
+1. Main instructions at top
+2. Input/configuration groups
+3. Notes and additional info
+4. Action buttons at bottom
+
+## Color Usage
+- Main text: Default system color
+- Group headers: Default system color
+- Notes: Gray (System.Windows.Media.Brushes.Gray)
+- Success: Green (System.Windows.Media.Brushes.Green)
+- Errors: Red (System.Windows.Media.Brushes.Red)
+- Disabled: System default gray
+
+## Standard Layout Structure
+- Use DockPanel as the main container
+- Create button panel at bottom using StackPanel
+- Use Grid for button layouts with multiple buttons
+- Use ScrollViewer for main content
+- Use StackPanel for main content organization
+- Use GroupBox to organize related controls
+
+## Input Validation
+- Validate numeric inputs immediately
+- Show clear error messages
+- Prevent invalid actions
+- Restore previous/default values on error
+
+## Progress & Processing
+- Show processing status in UI
+- Disable relevant controls during processing
+- Provide cancel option for long operations
+- Show batch progress for multiple items
+- Log detailed progress to output window
+
+## Settings Persistence
+- Save user preferences using script.store_data()
+- Load saved settings on startup
+- Use reasonable defaults if no settings exist
+- Preserve settings across sessions
+
+## Error Handling
+- Show user-friendly error messages
+- Log detailed errors to output window
+- Provide recovery options where possible
+- Maintain UI responsiveness during errors
+- Clean up resources in finally blocks
+
+## Component Examples
+```python
+# Main window setup
+self.Title = "Tool Name"
+self.Width = 450
+self.MinWidth = 400
+self.SizeToContent = System.Windows.SizeToContent.Height
+self.ResizeMode = System.Windows.ResizeMode.CanResizeWithGrip
+
+# Main DockPanel
+dock_panel = System.Windows.Controls.DockPanel()
+dock_panel.LastChildFill = True
+
+# Button panel
+button_panel = System.Windows.Controls.StackPanel()
+button_panel.Margin = System.Windows.Thickness(10)
+System.Windows.Controls.DockPanel.SetDock(button_panel, System.Windows.Controls.Dock.Bottom)
+
+# Primary button
+primary_button = System.Windows.Controls.Button()
+primary_button.Content = "Process"
+primary_button.Height = 30
+primary_button.Margin = System.Windows.Thickness(0, 0, 5, 0)
+primary_button.ToolTip = "Start processing"
+
+# Cancel button
+cancel_button = System.Windows.Controls.Button()
+cancel_button.Content = "Cancel"
+cancel_button.Height = 30
+cancel_button.Margin = System.Windows.Thickness(5, 0, 0, 0)
+
+# Input with units
+input_panel = System.Windows.Controls.StackPanel()
+input_panel.Orientation = System.Windows.Controls.Orientation.Horizontal
+
+value_input = System.Windows.Controls.TextBox()
+value_input.Width = 50
+value_input.Margin = System.Windows.Thickness(0, 0, 5, 0)
+
+units_label = System.Windows.Controls.TextBlock()
+units_label.Text = "units"
+units_label.VerticalAlignment = System.Windows.VerticalAlignment.Center
+
+# GroupBox for related controls
+group_box = System.Windows.Controls.GroupBox()
+group_box.Header = "Group Title"
+group_box.Margin = System.Windows.Thickness(0, 0, 0, 10)
+
+group_content = System.Windows.Controls.StackPanel()
+group_content.Margin = System.Windows.Thickness(10)
+group_box.Content = group_content
+
+# Access system resources in XAML
+app = System.Windows.Application.Current
+app.Resources.MergedDictionaries.Add(
+    System.Windows.ResourceDictionary()
+    {
+        Source = System.Uri("pack://application:,,,/PresentationFramework.Aero;component/themes/aero.normalcolor.xaml")
+    }
+)
+```

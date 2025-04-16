@@ -1,0 +1,118 @@
+---
+description: Rules for Dynamo Python Development
+globs: 
+alwaysApply: false
+---
+---
+description: Rules for Dynamo Python Development
+description: Cursor Rules for Dynamo Python Scripts
+globs: ["*.dyf", "*.dyn", "**/Dynamo/**/*.py"]
+alwaysApply: false
+---
+
+```JSON
+{
+  "version": "2024-12-23 10:15 PT",
+  "cursor_ai_config": {
+    "language_features": {
+      "required": ["input_output", "error_handling"],
+      "preferred": ["list_handling", "geometry_conversion"]
+    },
+    "templates": {
+      "base_imports": [
+        "import clr",
+        "clr.AddReference('RevitAPI')",
+        "clr.AddReference('RevitNodes')",
+        "from Autodesk.Revit.DB import *",
+        "import Revit",
+        "clr.ImportExtensions(Revit.Elements)"
+      ],
+      "error_handling": [
+        "try:",
+        "    # Code here",
+        "except Exception as e:",
+        "    OUT = 'Error: ' + str(e)"
+      ],
+      "input_output": [
+        "# Input and output ports",
+        "input_var = IN[0]",
+        "# Code here",
+        "OUT = result"
+      ]
+    },
+    "dynamo_specific": {
+      "geometry_conversion": {
+        "description": "Convert between Revit and Dynamo geometry",
+        "revit_to_dynamo": "element.ToDSType(True)",
+        "dynamo_to_revit": "element.ToRevitType()"
+      },
+      "list_handling": {
+        "description": "List handling patterns for Dynamo",
+        "nested_lists": "Process data with appropriate level of nesting",
+        "flatten": "Use List.Flatten() only when appropriate",
+        "lacing": "Consider lacing when working with multiple lists"
+      },
+      "type_parameters": {
+        "description": "Accessing type parameters in Revit elements",
+        "pattern": "Always get the Type element first, then access parameters",
+        "steps": [
+          "1. Get the element's type ID using element.GetTypeId()",
+          "2. Get the type element using doc.GetElement(type_id)",
+          "3. Access parameters on the type element"
+        ],
+        "common_pitfalls": [
+          "Direct property access on type elements may fail with 'property cannot be read'",
+          "Use LookupParameter or get_Parameter methods instead of direct property access",
+          "Always check if parameters exist and have values before accessing"
+        ],
+        "example": [
+          "# Correct pattern for accessing type name",
+          "def get_element_type_name(element):",
+          "    type_id = element.GetTypeId()",
+          "    if type_id and type_id.IntegerValue > 0:",
+          "        type_element = element.Document.GetElement(type_id)",
+          "        if type_element:",
+          "            # Try parameter approach first",
+          "            type_param = type_element.get_Parameter(BuiltInParameter.SYMBOL_NAME_PARAM)",
+          "            if type_param and type_param.HasValue:",
+          "                return type_param.AsString()",
+          "    return \"Unknown\""
+        ]
+      }
+    },
+    "documentation": {
+      "required": {
+        "timestamp": {
+          "description": "Every script must include a timestamp in Pacific Time",
+          "format": "YYYY-MM-DD HH:MM PT",
+          "example": "# Version: 2024-12-23 10:15 PT"
+        },
+        "preamble": {
+          "description": "Brief description of script purpose and functionality",
+          "sections": [
+            "Purpose: What the script does",
+            "Inputs: Description of input ports",
+            "Outputs: Description of output ports",
+            "Dependencies: Required libraries/references"
+          ],
+          "example": "\"\"\"\\nPurpose: Collects all walls on input levels and returns their areas\\nInputs: Levels (list)\\nOutputs: Wall areas (list)\\nDependencies: Revit API, Dynamo Core\\n\"\"\""
+        }
+      }
+    },
+    "optimization": {
+      "caching": {
+        "enabled": true,
+        "recommended_strategies": [
+          "dictionary_caching",
+          "parameter_caching",
+          "geometry_caching"
+        ]
+      },
+      "transaction_handling": {
+        "required": true,
+        "scope": "minimal",
+        "pattern": "using TransactionManager to ensure operations are within transaction"
+      }
+    }
+  }
+}

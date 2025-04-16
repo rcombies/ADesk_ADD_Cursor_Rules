@@ -1,0 +1,103 @@
+---
+description: Rules for RevitPythonShell Development
+globs: 
+alwaysApply: false
+---
+---
+description: Cursor Rules for RevitPythonShell Python Scripts
+globs: ["*.rps", "**/revitpythonshell/**/*.py"]
+alwaysApply: false
+
+---
+
+```JSON
+
+{
+  "version": "2024-12-23 10:15 PT",
+  "cursor_ai_config": {
+    "language_features": {
+      "required": ["error_handling", "transaction_handling"],
+      "preferred": ["format()", "% formatting", "list_comprehension"],
+      "forbidden": []
+    },
+    "feature_templates": {
+      "base": {
+        "description": "Minimum required for any RPS script",
+        "imports": [
+          "import clr",
+          "clr.AddReference('RevitAPI')",
+          "clr.AddReference('RevitAPIUI')",
+          "from Autodesk.Revit.DB import *",
+          "from Autodesk.Revit.UI import *",
+          "import System",
+          "from System.Collections.Generic import List"
+        ]
+      },
+      "ui_interaction": {
+        "description": "For scripts needing forms and UI interaction",
+        "imports": [
+          "import System.Windows.Forms as WinForms",
+          "import System.Drawing"
+        ]
+      },
+      "selection": {
+        "description": "For scripts working with element selection",
+        "imports": [
+          "doc = __revit__.ActiveUIDocument.Document",
+          "uidoc = __revit__.ActiveUIDocument"
+        ]
+      }
+    },
+    "templates": {
+      "error_handling": [
+        "try:",
+        "    # Code here",
+        "except Exception as e:",
+        "    TaskDialog.Show('Error', str(e))"
+      ],
+      "transaction": [
+        "t = Transaction(doc, 'Transaction Name')",
+        "t.Start()",
+        "try:",
+        "    # Code here",
+        "    t.Commit()",
+        "except Exception as e:",
+        "    t.RollBack()",
+        "    raise e"
+      ]
+    },
+    "documentation": {
+      "required": {
+        "timestamp": {
+          "description": "Every script must include a timestamp in Pacific Time",
+          "format": "YYYY-MM-DD HH:MM PT",
+          "example": "# Version: 2024-12-23 10:15 PT"
+        },
+        "preamble": {
+          "description": "Brief description of script purpose and functionality",
+          "sections": [
+            "Purpose: What the script does",
+            "Usage: How to use the script",
+            "Dependencies: Required libraries/references"
+          ],
+          "example": "\"\"\"\\nPurpose: Collects all walls on selected levels and reports their areas\\nUsage: Select levels in project, run script\\nDependencies: Revit API\\n\"\"\""
+        }
+      }
+    },
+    "optimization": {
+      "caching": {
+        "enabled": true,
+        "recommended_strategies": [
+          "dictionary_caching",
+          "parameter_caching",
+          "set_caching"
+        ]
+      },
+      "api_patterns": {
+        "batch_collect": "Use FilteredElementCollector once",
+        "parameter_access": "Cache parameter values",
+        "transaction_grouping": "Group modifications in single transaction"
+      }
+    }
+  }
+}
