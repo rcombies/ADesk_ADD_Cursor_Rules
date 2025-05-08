@@ -1,7 +1,7 @@
 ---
-description: General Rules
+description: 
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 ---
 description: General development rules including literate programming standards

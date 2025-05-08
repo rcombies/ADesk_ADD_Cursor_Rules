@@ -1,0 +1,505 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Cursor Rules: Modeless WPF Forms in pyRevit (Revit 2023–2025)
+
+A set of rules and templates to guide an LLM (or developer) in generating modeless WPF forms for pyRevit tools. Follow these rules toegration with Revit's API, threading model, and UI patterns.
+
+---
+
+## 1. Script Metadata & Persistence  
+- **Rule 1.1** – In **every** `Script.py` that opens a modeless form, include at top:
+  ```python
+  __persistentengine__ = True
+  ```
+  This prevents the IronPython engine from unloading immediately, keeping the form and handlers alive.
+
+- **Rule 1.2** – Name your script file descriptively (e.g. `ModelessForm.py`) and place it in a pyRevit bundle folder alongside its XAML.
+
+- **Rule 1.3** – For complex forms, implement a request-based pattern:
+  ```python
+  class RevitRequest:
+      NoRequest = "NoRequest"
+      DeleteElements = "DeleteElements"
+      ModifyElements = "ModifyElements"
+      # Add more request types as needed
+  ```
+
+---
+
+## 2. Imports & References  
+- **Rule 2.1** – Always import Revit API, WPF, and pyRevit utilities:
+  ```python
+  from pyrevit import forms
+  from Autodesk.Revit.UI import IExternalEventHandler, ExternalEvent
+  from Autodesk.Revit.DB import Transaction, InvalidOperationException
+  import wpf  # For advanced WPF features
+  from System.Windows import Window, Application
+  from System.Windows.Media.Imaging import BitmapImage
+  ```
+- **Rule 2.2** – Use `__revit__.ActiveUIDocument` and `__revit__.ActiveUIDocument.Document` for `uidoc` and `doc` references.
+
+---
+
+## 3. XAML Layout & Loading  
+- **Rule 3.1** – Define a WPF window in XAML (e.g. `MyForm.xaml`) with named controls for code-behind hooks:
+  ```xml
+  <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+          Title="Modeless Tool" Height="150" Width="300"
+          WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <!-- Define styles and resources here -->
+        <Style TargetType="Button">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Padding" Value="10,5"/>
+        </Style>
+    </Window.Resources>
+    <StackPanel Margin="10">
+      <TextBlock x:Name="StatusText" Margin="0,0,0,10"/>
+      <Button Content="Action" Click="OnActionClick"/>
+    </StackPanel>
+  </Window>
+  ```
+- **Rule 3.2** – Load with `forms.WPFWindow.__init__(self, "MyForm.xaml")` inside your window class.
+- **Rule 3.3** – Remove `x:Class` directive when using IronPython.
+
+---
+
+## 4. Modeless Show & Owner  
+- **Rule 4.1** – In your WPFWindow subclass `__init__`, call:
+  ```python
+  self.show()  # modeless
+  ```
+- **Rule 4.2** – Rely on `WPFWindow` to attach the form to Revit's main window.
+- **Rule 4.3** – Handle window positioning if needed:
+  ```python
+  def set_window_position(self):
+      self.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen
+      # Or for custom position:
+      # self.Left = 100
+      # self.Top = 100
+  ```
+
+---
+
+## 5. ExternalEvent Handler Pattern  
+- **Rule 5.1** – **Never** call Revit API directly in button handlers.  
+- **Rule 5.2** – Create a robust `IExternalEventHandler` subclass:
+  ```python
+  class RevitEventHandler(IExternalEventHandler):
+      def __init__(self):
+          self.currentRequest = RevitRequest.NoRequest
+          self.requestData = None
+          
+      def SetRequest(self, request, data=None):
+          self.currentRequest = request
+          self.requestData = data
+          
+      def Execute(self, uiapp):
+          try:
+              if self.currentRequest == RevitRequest.DeleteElements:
+                  self.handle_delete()
+              elif self.currentRequest == RevitRequest.ModifyElements:
+                  self.handle_modify()
+          except InvalidOperationException as   (f"Operation failed: {ioe}", exitscript=False)
+          except Exception as e:
+              forms.alert(f"Error: {e}", exitscript=False)
+          finally:
+              # Always reset request
+              self.currentRequest = RevitRequest.NoRequest
+              self.requestData = None
+              
+      def GetName(self): 
+          return "RevitEventHandler"
+          
+      def handle_delete(self):
+          with Transaction(doc, "Delete Elements") as t:
+              t.Start()
+              try:
+                  # Delete operation
+                  t.Commit()
+              except:
+                  t.RollBack()
+                  raise
+  ```
+- **Rule 5.3** – Instantiate and store globally:
+  ```python
+  handler = RevitEventHandler()
+  ext_event = ExternalEvent.Create(handler)
+  ```
+- **Rule 5.4** – In WPF code-behind, raise events with data:
+  ```python
+  def OnActionClick(self, sender, args):
+      data = {"elements": self.selected_elements}
+      handler.SetRequest(RevitRequest.DeleteElements, data)
+      ext_event.Raise()
+      self.StatusText.Text = "Processing request..."
+  ```
+
+---
+
+## 6. Transaction & Error Handling  
+- **Rule 6.1** – Use transaction wrapper pattern:
+  ```python
+  def safe_transaction(doc, name, action):
+      with Transaction(doc, name) as t:
+          t.Start()
+          try:
+              action()
+              t.Commit()
+          except Exception as e:
+              t.RollBack()
+              raise
+  ```
+- **Rule 6.2** – Implement comprehensive error handling:
+  ```python
+  try:
+      # Operation code
+  except InvalidOperationException as ioe:
+      forms.alert(f"Cannot perform operation: {ioe}", exitscript=False)
+  except Exception as e:
+      forms.alert(f"Unexpected error: {e}", exitscript=False)
+      import traceback
+      print(traceback.format_exc())
+  ```
+
+---
+
+## 7. UI ⇒ Data Flow & Resource Management 
+- **Rule 7.1** – Initialize UI safely:
+  ```python
+  def __init__(self):
+      super().__init__("MyForm.xaml")
+      self._load_resources()
+      self._initialize_ui()
+      self.show()
+      
+  def _load_resources(self):
+      self.icons = {}
+      base_dir = os.path.dirname(__file__)
+      for name, path in self.ICON_PATHS.items():
+          full_path = os.path.join(base_dir, path)
+          self.icons[name] = self._load_bitmap(full_path)
+          
+  def _initialize_ui(self):
+      self.update_selection_count()
+      self.setup_event_handlers()
+  ```
+- **Rule 7.2** – Implement proper cleanup:
+  ```python
+  def __del__(self):
+      self.cleanup()
+      
+  def cleanup(self):
+      # Unsubscribe from events
+      for handler in self._event_handlers:
+          handler.Dispose()
+      # Clear resources
+      self.icons.Clear()
+  ```
+
+---
+
+## 8. Synchronization & Events  
+- **Rule 8.1** – Subscribe to Revit events via pyRevit:
+  ```python
+  from pyrevit import revit
+  
+  @revit.events.handle('doc-changed', 'view-activated')
+  def on_doc_change(sender, args):
+      if form and not form.IsDisposed:
+          form.refresh_ui()
+  ```
+- **Rule 8.2** – Implement UI refresh:
+  ```python
+  def refresh_ui(self):
+      self.update_selection_count()
+      self.update_status()
+      
+  def update_selection_count(self):
+      count = len(list(uidoc.Selection.GetElementIds()))
+      self.StatusText.Text = f"{count} elements selected"
+  ```
+
+---
+
+## 9. Threading & Performance  
+- **Rule 9.1** – Handle long operations correctly:
+  ```python
+  from System.Windows.Threading import DispatcherOperation
+  
+  def long_running_task(self):
+      # Run on background thread
+      Thread(ThreadStart(self._background_work)).Start()
+      
+  def _background_work(self):
+      # Do heavy computation
+      result = compute_something()
+      # Update UI thread-safely
+      self.Dispatcher.Invoke(
+          lambda: self.update_ui_with_result(result)
+      )
+  ```
+- **Rule 9.2** – Cache expensive operations:
+  ```python
+  class ElementCache:
+      def __init__(self):
+          self._cache = {}
+          
+      def get_geometry(self, element_id):
+          if element_id not in self._cache:
+              self._cache[element_id] = doc.GetElement(element_id).Geometry
+          return self._cache[element_id]
+  ```
+
+---
+
+## 10. Single Instance & State Management  
+- **Rule 10.1** – Implement singleton pattern:
+  ```python
+  class MyForm(forms.WPFWindow):
+      _instance = None
+      
+      @classmethod
+      def show_dialog(cls):
+          if not cls._instance:
+              cls._instance = cls()
+          elif cls._instance.IsDisposed:
+              cls._instance = cls()
+          else:
+              cls._instance.Focus()
+          return cls._instance
+  ```
+- **Rule 10.2** – Handle state persistence:
+  ```python
+  def save_state(self):
+      # Save form state
+      state = {
+          "position": (self.Left, self.Top),
+          "size": (self.Width, self.Height),
+          "settings": self.current_settings
+      }
+      with open(self.state_file, 'w') as f:
+          json.dump(state, f)
+          
+  def restore_state(self):
+      if os.path.exists(self.state_file):
+          with open(self.state_file, 'r') as f:
+              state = json.load(f)
+              self.Left, self.Top = state["position"]
+              self.Width, self.Height = state["size"]
+              self.current_settings = state["settings"]
+  ```
+
+---
+
+## 11. Version Compatibility  
+- **Rule 11.1** – Test in **Revit 2023**, **2024**, **2025** with pyRevit ≥ 4.5.  
+- **Rule 11.2** – Use version-specific code when needed:
+  ```python
+  from pyrevit import HOST_APP
+  
+  if HOST_APP.version > '2023':
+      # Use newer API features
+  else:
+      # Use compatible alternative
+  ```
+
+---
+
+## 12. Debugging & Testing
+- **Rule 12.1** – Implement logging:
+  ```python
+  import logging
+
+  logger = logging.getLogger(__name__)
+  
+  def setup_logging():
+      handler = logging.FileHandler('modeless_form.log')
+      handler.setFormatter(
+          logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+      )
+      logger.addHandler(handler)
+      logger.setLevel(logging.DEBUG)
+  
+  def log_request(self, request, data):
+      logger.debug(f"Request: {request}, Data: {data}")
+  ```
+- **Rule 12.2** – Add debug helpers:
+  ```python
+  def dump_element_info(element_id):
+      element = doc.GetElement(element_id)
+      logger.debug(f"Element: {element.Id}")
+      logger.debug(f"Category: {element.Category.Name}")
+      logger.debug(f"Parameters: {[p.Definition.Name for p in element.Parameters]}")
+  ```
+
+---
+
+## 13. Complete Working Example
+
+<details>
+<summary><strong>Python (Script.py)</strong></summary>
+
+```python
+__persistentengine__ = True
+
+from pyrevit import forms
+from Autodesk.Revit.UI import IExternalEventHandler, ExternalEvent
+from Autodesk.Revit.DB import Transaction, InvalidOperationException
+import json
+import os
+
+uidoc = __revit__.ActiveUIDocument
+doc = uidoc.Document
+
+# Request Types
+class RevitRequest:
+    NoRequest = "NoRequest"
+    DeleteElements = "DeleteElements"
+    ModifyElements = "ModifyElements"
+
+# Event Handler
+class DeleteHandler(IExternalEventHandler):
+    def __init__(self):
+        self.currentRequest = RevitRequest.NoRequest
+        self.requestData = None
+    
+    def SetRequest(self, request, data=None):
+        self.currentRequest = request
+        self.requestData = data
+    
+    def Execute(self, uiapp):
+        try:
+            if self.currentRequest == RevitRequest.DeleteElements:
+                self.delete_elements()
+        except Exception as e:
+            forms.alert(str(e), exitscript=False)
+        finally:
+            self.currentRequest = RevitRequest.NoRequest
+            self.requestData = None
+    
+    def delete_elements(self):
+        if not self.requestData:
+            return
+        with Transaction(doc, "Delete Elements") as t:
+            t.Start()
+            try:
+                for eid in self.requestData["element_ids"]:
+                    doc.Delete(eid)
+                t.Commit()
+            except:
+                t.RollBack()
+                raise
+    
+    def GetName(self): 
+        return "DeleteHandler"
+
+# Create handler instance
+handler = DeleteHandler()
+ext_event = ExternalEvent.Create(handler)
+
+# Form Class
+class MyForm(forms.WPFWindow):
+    _instance = None
+    
+    @classmethod
+    def show_dialog(cls):
+        if not cls._instance:
+            cls._instance = cls()
+        elif cls._instance.IsDisposed:
+            cls._instance = cls()
+        else:
+            cls._instance.Focus()
+        return cls._instance
+    
+    def __init__(self):
+        super().__init__("MyForm.xaml")
+        self.setup_form()
+        self.show()
+    
+    def setup_form(self):
+        self.update_selection_count()
+        # Subscribe to selection changes
+        self.selection_changed_handler = \
+            revit.doc.Application.DocumentChanged += \
+                self.on_selection_changed
+    
+    def update_selection_count(self):
+        count = len(list(uidoc.Selection.GetElementIds()))
+        self.StatusText.Text = f"{count} elements selected"
+    
+    def OnActionClick(self, sender, args):
+        ids = list(uidoc.Selection.GetElementIds())
+        if not ids:
+            forms.alert("No elements selected", exitscript=False)
+            return
+        handler.SetRequest(RevitRequest.DeleteElements, 
+                         {"element_ids": ids})
+        ext_event.Raise()
+        self.StatusText.Text = "Processing delete..."
+    
+    def on_selection_changed(self, sender, args):
+        self.update_selection_count()
+    
+    def __del__(self):
+        if self.selection_changed_handler:
+            revit.doc.Application.DocumentChanged -= \
+                self.selection_changed_handler
+
+if __name__ == "__main__":
+    MyForm.show_dialog()
+```
+</details>
+
+<details>
+<summary><strong>XAML (MyForm.xaml)</strong></summary>
+
+```xml
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Element Manager" Height="200" Width="400"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Padding" Value="10,5"/>
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+    </Window.Resources>
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <TextBlock x:Name="StatusText" 
+                   Grid.Row="0"
+                   FontWeight="Bold"/>
+        
+        <StackPanel Grid.Row="2" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right">
+            <Button Content="Delete Selected" 
+                    Click="OnActionClick"/>
+        </StackPanel>
+    </Grid>
+</Window>
+```
+</details>
+
+This example demonstrates:
+- Proper event handling
+- Transaction management
+- UI updates
+- Selection tracking
+- Resource cleanup
+- Single instance pattern
+``` 

@@ -1,0 +1,253 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Literate Programming Rules
+
+## Table of Contents
+1. [Introduction](mdc:ADesk_ADD/ADesk_ADD/#introduction)
+2. [Historical Context](mdc:ADesk_ADD/ADesk_ADD/#historical-context)
+3. [Core Principles](mdc:ADesk_ADD/ADesk_ADD/#core-principles)
+4. [Documentation Structure](mdc:ADesk_ADD/ADesk_ADD/#documentation-structure)
+5. [Implementation Guidelines](mdc:ADesk_ADD/ADesk_ADD/#implementation-guidelines)
+6. [Best Practices](mdc:ADesk_ADD/ADesk_ADD/#best-practices)
+7. [Validation Checklist](mdc:ADesk_ADD/ADesk_ADD/#validation-checklist)
+
+## Introduction
+These rules establish standards for documenting code in a literate programming style, combining natural language explanations with code. The goal is to make code self-documenting and easily understandable by both humans and machines.
+
+## Historical Context
+
+### 1. Foundational Concepts
+- **Literate Programming** (Donald Knuth, 1984)
+  - **Core Concept**: Programs should be written to be read by humans first, machines second
+  - **Original Implementation**: WEB system for Pascal, combining TeX and Pascal
+  - **Key Principles**:
+    - Documentation and code are treated as one unified entity
+    - Code is explained in natural language
+    - Program structure follows human logic rather than compiler requirements
+
+### 2. Modern Documentation Systems
+- **Python Docstrings** (Guido van Rossum, 1991)
+  - **Core Concept**: Documentation embedded within Python source code
+  - **Original Implementation**: Triple-quoted strings for documentation
+  - **Key Principles**:
+    - Documentation as first-class language feature
+    - Accessible through introspection
+    - Multiple standardized formats (Google, NumPy, reStructuredText)
+  - Tools like Sphinx for documentation generation
+
+- **JavaDoc/JSDoc** (Sun Microsystems, 1995 / Mozilla, 1999)
+  - **Core Concept**: Documentation comments for Java/JavaScript APIs
+  - **Original Implementation**: Special comment syntax with @tags
+  - **Key Principles**:
+    - Structured API documentation
+    - Type information and usage examples
+    - Automated documentation generation
+
+### 3. Contemporary Influences
+- **Markdown-Driven Documentation** (John Gruber, 2004)
+  - **Core Concept**: Plain text formatting syntax for web content
+  - **Original Implementation**: Perl script converting Markdown to HTML
+  - **Key Principles**:
+    - Readable plain text format
+    - Simple syntax for common formatting
+    - GitHub's approach to documentation
+    - README-driven development
+    - Documentation as code (docs-as-code)
+
+- **Visual Documentation**
+  - Mermaid (Knut Sveidqvist, 2014)
+    - **Core Concept**: Markdown-based diagramming and charting tool
+    - **Original Implementation**: JavaScript-based diagram generation
+    - **Key Principles**:
+      - Text-to-diagram conversion
+      - Version control friendly
+      - Multiple diagram types (flow, sequence, etc.)
+  - PlantUML (Arnaud Roques, 2009)
+    - **Core Concept**: UML diagram generation from text
+    - **Original Implementation**: Java-based diagram generator
+    - **Key Principles**:
+      - Text-based UML modeling
+      - Multiple diagram types
+      - Integration with documentation tools
+  - C4 model for system architecture (Simon Brown, 2018)
+    - **Core Concept**: Hierarchical approach to software architecture documentation
+    - **Original Implementation**: Context, Containers, Components, and Code levels
+    - **Key Principles**:
+      - Start with context and progressively zoom in
+      - Use consistent notation across all levels
+      - Focus on people, software systems, and containers
+  - Architecture Decision Records (Michael Nygard, 2011)
+    - **Core Concept**: Lightweight documentation of architectural decisions
+    - **Original Implementation**: Markdown-based decision records
+    - **Key Principles**:
+      - Capture context and consequences
+      - Track decision history
+      - Link decisions to code
+
+## Core Principles
+
+### 1. Code Companion Pattern
+- **Core Concept**: Separate but parallel documentation files
+- **Key Principles**:
+  - Direct line-number references
+  - Progressive disclosure of concepts
+  - Integration with IDEs
+  - Version control friendly
+  - Support for modern programming paradigms
+
+### 2. Industry Standards Integration
+- **Google Style Guides**
+  - Clear, consistent documentation standards
+  - Example-driven documentation
+  - Accessibility considerations
+
+- **Microsoft Documentation**
+  - Conceptual/Reference/Tutorial structure
+  - Task-based documentation
+  - Progressive disclosure
+
+## Documentation Structure
+
+### 1. Linear Code Following
+The documentation MUST follow the exact structure and flow of the source code:
+- Document elements in the order they appear in the code
+- Maintain the same hierarchical structure as the code
+- Use line numbers to reference specific code sections
+- Explain code elements as they are encountered
+
+### 2. Context Preservation
+- Each code section must be explained in its original context
+- Previous code elements should be referenced when explaining dependencies
+- Future code elements should not be referenced before their documentation
+- Maintain a "first encounter" principle - fully explain concepts when first seen
+
+### 3. Progressive Disclosure
+Document code in layers:
+1. First encounter: Full explanation with context
+2. Subsequent uses: Reference back to original explanation
+3. Modifications: Explain changes to previously documented behavior
+
+### 4. Code Companion File Structure
+- Create a CODE_COMPANION.md file in the same directory as the main code file
+- Name should match the source file with "_COMPANION" suffix
+- Use markdown format for rich text and diagrams
+- Follow the exact structure of the source file
+
+## Implementation Guidelines
+
+### 1. Code Documentation
+Each code section should be documented with:
+```markdown
+## Section Name (lines X-Y)
+
+### Code
+```python
+# Relevant code snippet
+```
+
+### Purpose
+Explanation of what this code does and why it exists
+
+### Implementation Details
+How the code works, in the context of what's been shown so far
+
+### Usage
+Examples using only previously documented code
+
+### Dependencies
+References to previously documented components
+```
+
+### 2. Component Types
+- **Constants and Configuration**
+  - Purpose of each configuration item
+  - Impact of modifications
+  - Default values and their reasoning
+
+- **Functions and Classes**
+  - Input/Output specifications
+  - Side effects
+  - Error conditions
+  - Usage examples
+  - Performance characteristics
+
+- **Data Structures**
+  - Data organization
+  - Access patterns
+  - Validation rules
+  - Performance implications
+
+### 3. Visual Documentation
+- Use Mermaid diagrams for:
+  - Flow charts
+  - Sequence diagrams
+  - Component relationships
+  - Data structures
+- Include ASCII diagrams when Mermaid isn't suitable
+
+### 4. Code Flow Documentation
+Document code flow in order of execution:
+```markdown
+### Processing Flow (lines X-Y)
+1. First operation
+   ```python
+   data = load_data()
+   ```
+   Explains initial data loading...
+
+2. Data transformation
+   ```python
+   result = transform(data)
+   ```
+   Explains transformation using previously documented transform function...
+
+3. Final output
+   ```python
+   save_result(result)
+   ```
+   Explains how results are saved...
+```
+
+## Best Practices
+
+### 1. Documentation Standards
+- Show minimal, relevant code sections
+- Include line numbers for reference
+- Use syntax highlighting
+- Explain non-obvious code patterns
+
+### 2. Cross-References
+- Link related components
+- Reference relevant documentation
+- Cite external resources
+- Maintain a dependency graph
+
+### 3. Component Documentation
+Each component should explain:
+- Purpose (what and why)
+- Implementation details (how)
+- Usage examples
+- Error handling
+- Performance considerations
+
+## Validation Checklist
+
+- [ ] Documentation matches code structure
+- [ ] All major components are documented
+- [ ] Examples are up to date
+- [ ] Diagrams reflect current architecture
+- [ ] Cross-references are valid
+- [ ] Performance implications are documented
+- [ ] Error handling is explained
+- [ ] Dependencies are listed
+- [ ] Usage examples are complete
+- [ ] Visual aids are clear and relevant
+- [ ] Documentation follows code structure exactly
+- [ ] Line numbers are included for all code sections
+- [ ] Concepts are explained on first encounter
+- [ ] Forward references are avoided
+- [ ] Dependencies reference previous sections
+- [ ] Code flow is documented sequentially

@@ -1,7 +1,7 @@
 ---
-description: 
+description: XAML based WPF
 globs: 
-alwaysApply: true
+alwaysApply: false
 ---
 # PyRevit UI Style Guide
 
@@ -32,6 +32,74 @@ alwaysApply: true
 - Use for logical separation of functionality
 - Add 10px internal margin for content
 - Add 10px margin between groups
+
+## Modern GroupBox Style (Method 3)
+- Use a custom template for consistent, modern appearance
+- Apply rounded corners (CornerRadius="8") to the GroupBox border
+- Position the header to overlap the top border with a negative margin
+- Use light background color (#F8F8F8) for better visual separation
+- Enable flexible sizing with the following techniques:
+  - Set both HorizontalAlignment and VerticalAlignment to Stretch for resizable forms
+  - Use MinWidth for content to ensure proper initial sizing
+  - Add ScrollViewer for content when vertical scrolling may be needed
+- Template example:
+```xml
+<Style x:Key="ModernGroupBox" TargetType="GroupBox">
+    <Setter Property="BorderBrush" Value="#CCCCCC"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="Padding" Value="8"/>
+    <Setter Property="Template">
+        <Setter.Value>
+            <ControlTemplate TargetType="GroupBox">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!-- Background and border -->
+                    <Border Grid.Row="0" Grid.RowSpan="2" 
+                            BorderBrush="{TemplateBinding BorderBrush}" 
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="8" Background="#F8F8F8"
+                            Margin="0,-9,0,0"/>
+                    
+                    <!-- Header -->
+                    <Border Grid.Row="0" Margin="8,0,8,0" Background="#F8F8F8">
+                        <ContentPresenter ContentSource="Header" 
+                                          TextBlock.FontWeight="Bold"
+                                          RecognizesAccessKey="True"/>
+                    </Border>
+                    
+                    <!-- Content -->
+                    <ContentPresenter Grid.Row="1" 
+                                      Margin="{TemplateBinding Padding}"/>
+                </Grid>
+            </ControlTemplate>
+        </Setter.Value>
+    </Setter>
+</Style>
+```
+
+### Header Position Fine-Tuning
+- The header position is controlled by the `Margin` property of the background border
+- Use negative top margin to position the header properly:
+  - For smaller fonts (~12px): `Margin="0,-6,0,0"`
+  - For standard fonts (~14px): `Margin="0,-9,0,0"`
+  - For larger fonts (~16px): `Margin="0,-12,0,0"`
+- To center the header text on the border, adjust the header Border's `Margin` property
+- Test different values to achieve the desired look across different DPI settings
+
+### Best Practices
+- Use consistent colors across all GroupBoxes in your application
+- Keep the same corner radius for all rounded elements (buttons, GroupBoxes)
+- When implementing a resizable form:
+  - Set minimum dimensions for the Window to prevent content from being cut off
+  - Use `SizeToContent="WidthAndHeight"` for initial sizing but provide minimums
+  - Apply ScrollViewers inside GroupBoxes for forms with dense content
+- For forms with multiple GroupBoxes:
+  - Keep the same width for all GroupBoxes in a column for visual alignment
+  - Apply consistent spacing between GroupBoxes (8-10px recommended)
 
 ## Input Controls
 - Label inputs clearly with units where applicable
@@ -166,3 +234,83 @@ app.Resources.MergedDictionaries.Add(
     }
 )
 ```
+
+## Implementation Examples
+
+### Fixed-Size Form Implementation
+For forms with fixed dimensions:
+```xml
+<GroupBox Header="Settings" Style="{StaticResource ModernGroupBox}"
+          HorizontalAlignment="Center" Margin="0,0,0,10">
+    <StackPanel Margin="5">
+        <!-- Content here -->
+    </StackPanel>
+</GroupBox>
+```
+
+### Resizable Form Implementation
+For forms that can be resized by the user:
+```xml
+<!-- Main form Grid -->
+<Grid>
+    <Grid.RowDefinitions>
+        <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+    
+    <!-- GroupBox that stretches with form -->
+    <GroupBox Header="Tools" Style="{StaticResource ModernGroupBox}"
+              Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel MinWidth="200" HorizontalAlignment="Center">
+                <!-- Content here -->
+            </StackPanel>
+        </ScrollViewer>
+    </GroupBox>
+</Grid>
+```
+
+### In Code-Behind
+Creating the modern GroupBox style in code:
+```csharp
+// Create modern GroupBox style
+Style modernGroupBoxStyle = new Style(typeof(GroupBox));
+modernGroupBoxStyle.Setters.Add(new Setter(GroupBox.BorderBrushProperty, new SolidColorBrush(Color.FromRgb(0xCC, 0xCC, 0xCC))));
+modernGroupBoxStyle.Setters.Add(new Setter(GroupBox.BorderThicknessProperty, new Thickness(1)));
+modernGroupBoxStyle.Setters.Add(new Setter(GroupBox.PaddingProperty, new Thickness(8)));
+
+// Create template
+ControlTemplate template = new ControlTemplate(typeof(GroupBox));
+FrameworkElementFactory gridFactory = new FrameworkElementFactory(typeof(Grid));
+
+// Set up row definitions
+FrameworkElementFactory rowDef1 = new FrameworkElementFactory(typeof(RowDefinition));
+rowDef1.SetValue(RowDefinition.HeightProperty, GridLength.Auto);
+FrameworkElementFactory rowDef2 = new FrameworkElementFactory(typeof(RowDefinition));
+rowDef2.SetValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Star));
+
+// Add row definitions to grid
+FrameworkElementFactory rowDefsFactory = new FrameworkElementFactory(typeof(Grid.RowDefinitions));
+rowDefsFactory.AppendChild(rowDef1);
+rowDefsFactory.AppendChild(rowDef2);
+gridFactory.AppendChild(rowDefsFactory);
+
+// Create background border
+FrameworkElementFactory borderFactory = new FrameworkElementFactory(typeof(Border));
+borderFactory.SetValue(Grid.RowProperty, 0);
+borderFactory.SetValue(Grid.RowSpanProperty, 2);
+borderFactory.SetValue(Border.BorderBrushProperty, new TemplateBindingExtension(GroupBox.BorderBrushProperty));
+borderFactory.SetValue(Border.BorderThicknessProperty, new TemplateBindingExtension(GroupBox.BorderThicknessProperty));
+borderFactory.SetValue(Border.CornerRadiusProperty, new CornerRadius(8));
+borderFactory.SetValue(Border.BackgroundProperty, new SolidColorBrush(Color.FromRgb(0xF8, 0xF8, 0xF8)));
+borderFactory.SetValue(Border.MarginProperty, new Thickness(0, -9, 0, 0));
+gridFactory.AppendChild(borderFactory);
+
+// Set template and apply style
+template.VisualTree = gridFactory;
+modernGroupBoxStyle.Setters.Add(new Setter(GroupBox.TemplateProperty, template));
+
+// Apply style to GroupBox
+myGroupBox.Style = modernGroupBoxStyle;
+```
+
+## Input Controls
