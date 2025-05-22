@@ -15,7 +15,7 @@ alwaysApply: false
   "version": "2024-12-23 10:15 PT",
   "cursor_ai_config": {
     "language_features": {
-      "required": ["input_output", "error_handling"],
+      "required": ["input_output", "error_handling", "element_unwrapping"],
       "preferred": ["list_handling", "geometry_conversion"]
     },
     "templates": {
@@ -37,10 +37,52 @@ alwaysApply: false
         "# Input and output ports",
         "input_var = IN[0]",
         "# Code here",
-        "OUT = result"
+        "OUT = result",
+        "# Note: Dynamo Python nodes only support a single OUT port",
+        "# Multiple values should be combined into a single list or dictionary"
+      ],
+      "element_unwrapping": [
+        "# For single elements",
+        "element = UnwrapElement(IN[0]) if IN[0] else None",
+        "",
+        "# For lists of elements",
+        "elements = [UnwrapElement(item) for item in IN[0] if item]",
+        "",
+        "# With error handling",
+        "try:",
+        "    elements = [UnwrapElement(item) for item in IN[0] if item]",
+        "except Exception as e:",
+        "    OUT = f\"Error unwrapping elements: {str(e)}\""
       ]
     },
     "dynamo_specific": {
+      "element_unwrapping": {
+        "description": "Guidelines for properly unwrapping Dynamo elements to access Revit API",
+        "importance": "critical",
+        "when_to_use": "Always unwrap input elements before accessing Revit API properties or methods",
+        "patterns": {
+          "single_element": "element = UnwrapElement(IN[0])",
+          "element_list": "elements = [UnwrapElement(item) for item in IN[0]]",
+          "conditional": "elements = [UnwrapElement(item) for item in IN[0] if item]",
+          "nested_lists": "elements = [[UnwrapElement(i) for i in sublist if i] for sublist in IN[0] if sublist]"
+        },
+        "common_errors": [
+          "AttributeError: '<element type>' object has no attribute '<property>' - Usually means the element needs to be unwrapped",
+          "Cannot use Dynamo wrappers directly with Revit API methods",
+          "Forgetting to unwrap elements from input ports"
+        ],
+        "example": [
+          "# Input: List of Revit rooms from Dynamo node",
+          "# Problem: Can't access Room.Location directly",
+          "rooms = UnwrapElement(IN[0])",
+          "",
+          "# Now we can use Revit API methods",
+          "for room in rooms:",
+          "    if room:",
+          "        location = room.Location.Point",
+          "        # Process with Revit API"
+        ]
+      },
       "geometry_conversion": {
         "description": "Convert between Revit and Dynamo geometry",
         "revit_to_dynamo": "element.ToDSType(True)",

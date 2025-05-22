@@ -3,20 +3,6 @@ description:
 globs: 
 alwaysApply: true
 ---
----
-description: General development rules including literate programming standards
-globs: ["**/*.py", "**/*.cs", "**/*.js", "**/*.ts"]
-alwaysApply: true
-extends: [
-    "literate-programming-rules.mdc",
-    "pyrevit-rules.mdc",
-    "revitpythonshell-rules.mdc",
-    "dynamo-rules.mdc"
-]
-combinable: true
-priority: 1
----
-
 # General Development Rules
 
 ## Rule Combination Guidelines
@@ -193,4 +179,5 @@ Explanation of this code section...
       }
     }
   }
+
 }
