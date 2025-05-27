@@ -3,16 +3,17 @@ description:
 globs: 
 alwaysApply: false
 ---
-# Literate Programming Rules
+# Description: Generate a Code Companion Doc for Education and Explanation Using Literate Programming Rules
+# Author: Ryan Combies
 
 ## Table of Contents
-1. [Introduction](mdc:ADesk_ADD/ADesk_ADD/#introduction)
-2. [Historical Context](mdc:ADesk_ADD/ADesk_ADD/#historical-context)
-3. [Core Principles](mdc:ADesk_ADD/ADesk_ADD/#core-principles)
-4. [Documentation Structure](mdc:ADesk_ADD/ADesk_ADD/#documentation-structure)
-5. [Implementation Guidelines](mdc:ADesk_ADD/ADesk_ADD/#implementation-guidelines)
-6. [Best Practices](mdc:ADesk_ADD/ADesk_ADD/#best-practices)
-7. [Validation Checklist](mdc:ADesk_ADD/ADesk_ADD/#validation-checklist)
+1. [Introduction](mdc:ADesk_ADD/ADesk_ADD/ADesk_ADD/#introduction)
+2. [Historical Context](mdc:ADesk_ADD/ADesk_ADD/ADesk_ADD/#historical-context)
+3. [Core Principles](mdc:ADesk_ADD/ADesk_ADD/ADesk_ADD/#core-principles)
+4. [Documentation Structure](mdc:ADesk_ADD/ADesk_ADD/ADesk_ADD/#documentation-structure)
+5. [Implementation Guidelines](mdc:ADesk_ADD/ADesk_ADD/ADesk_ADD/#implementation-guidelines)
+6. [Best Practices](mdc:ADesk_ADD/ADesk_ADD/ADesk_ADD/#best-practices)
+7. [Validation Checklist](mdc:ADesk_ADD/ADesk_ADD/ADesk_ADD/#validation-checklist)
 
 ## Introduction
 These rules establish standards for documenting code in a literate programming style, combining natural language explanations with code. The goal is to make code self-documenting and easily understandable by both humans and machines.

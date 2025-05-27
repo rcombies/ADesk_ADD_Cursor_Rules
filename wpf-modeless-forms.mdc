@@ -3,11 +3,9 @@ description: Modeless WPF Forms
 globs: 
 alwaysApply: false
 ---
-# Cursor Rules: Modeless WPF Forms in pyRevit (Revit 2023–2025)
+# Description: Modeless WPF Forms in pyRevit (Revit 2023, 2024, 2025). A set of rules and templates to guide an LLM (or developer) in generating modeless WPF forms for pyRevit tools. Follow these rules toegration with Revit's API, threading model, and UI patterns.
 
-A set of rules and templates to guide an LLM (or developer) in generating modeless WPF forms for pyRevit tools. Follow these rules toegration with Revit's API, threading model, and UI patterns.
-
----
+## Author: Ryan Combies
 
 ## 1. Script Metadata & Persistence  
 - **Rule 1.1** – In **every** `Script.py` that opens a modeless form, include at top:

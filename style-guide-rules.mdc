@@ -4,6 +4,7 @@ globs:
 alwaysApply: false
 ---
 # PyRevit UI Style Guide
+## Author: Ryan Combies
 
 ## Window Layout
 - Use a clean, modern layout with consistent spacing

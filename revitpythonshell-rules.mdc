@@ -3,12 +3,8 @@ description: Rules for RevitPythonShell Development
 globs: 
 alwaysApply: false
 ---
----
-description: Cursor Rules for RevitPythonShell Python Scripts
-globs: ["*.rps", "**/revitpythonshell/**/*.py"]
-alwaysApply: false
-
----
+# Description: Cursor Rules for RevitPythonShell Python Scripts
+# Author: Ryan Combies
 
 ```JSON
 

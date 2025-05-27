@@ -3,12 +3,8 @@ description: Rules for pyRevit Development
 globs: 
 alwaysApply: false
 ---
----
-description: Rules for pyRevit Python Development
-globs: ["**/pyRevit/**/*.py", "*.extension/*.tab/*.panel/*.pushbutton/*.py", "*.extension/*.tab/*.panel/*.smartbutton/*.py", "*.extension/*.tab/*.panel/*.pulldown/*/*.py"]
-alwaysApply: false
-
----
+# Description: Rules for pyRevit Python Development
+# Author: Ryan Combies
 
 ```JSON
 {

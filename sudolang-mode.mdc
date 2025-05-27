@@ -3,12 +3,8 @@ description:
 globs: 
 alwaysApply: false
 ---
----
-description: SudoLang Mode for natural language coding, code understanding and investigation.
-globs: "*.sudo"
-alwaysApply: false
-
----
+# Description: SudoLang Mode for natural language coding, code understanding and investigation.
+# Author: Ryan Combies
 
 ```JSON
 {

@@ -3,12 +3,8 @@ description: Rules for Dynamo Python Development
 globs: 
 alwaysApply: false
 ---
----
-description: Rules for Dynamo Python Development
-description: Cursor Rules for Dynamo Python Scripts
-globs: ["*.dyf", "*.dyn", "**/Dynamo/**/*.py"]
-alwaysApply: false
----
+# Description: Rules for Dynamo Python Development
+# Author: Ryan Combies
 
 ```JSON
 {
